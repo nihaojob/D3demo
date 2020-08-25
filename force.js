@@ -1,179 +1,166 @@
-let width = document.getElementById("tree").offsetWidth;
-let height = document.getElementById("tree").offsetHeight;
 
 
-// Create a new directed graph
-let g = new dagreD3.graphlib.Graph().setGraph({
-    rankdir: 'LR', // 水平
-    nodesep: 15, // 
-    edgesep: 10,
-    ranksep: 80,
-    marginx: 20,
-    marginy: 20
-});
+function renderGraphChart(data,extendConfig = {}, elId = '#tree'){
+    // 节点数据
+    this.NodeList = {...extendConfig}
+    // 关系数据
+    this.edgeList = data;
+    this.elId = elId;
+    // 筛选不包含在extendConfig中的节点
+    this.mregeEdgeNode()
+    // 渲染节点
+    this.renderNode()
+    // 添加鼠标经过事件
+    this.addMouseover()
+}
 
-
-let states = {
-    "begin": {
-    //   style: "fill: #afa; stroke: #222"
-    },
-    "analyze_insert_mid_zg_proxy_user": {},
-    "analyze_insert_mid_zg_order": {},
-    "analyze_insert_mid_zg_enquiry": {},
-    "analyze_insert_mid_zg_allowance": {},
-    "analyze_insert_app_zg_order_deposit": {},
-    "analyze_insert_app_zg_enquiry": {},
-    "analyze_insert_app_zg_allowance": {},
-    "end": {},
-};
-
-
-
-
-
-Object.keys(states).forEach(function(state) {
-    var value = states[state];
-    value.label = state;
-    value.rx = value.ry = 5;
-    value.style = "fill: #f1ede4; stroke: #82b784; color: #222; margin: 5px";
-    g.setNode(state, value);
-});
-
-
-// Set up the edges
-// g.setEdge("begin", "analyze_insert_mid_zg_proxy_user", {
-//     label: "",
-//     lineInterpolate: 'basis',
-//     // style: "fill: none; stroke: #7f7f7f"
-// });
-// g.setEdge("begin", "analyze_insert_mid_zg_order", {
-//     label: "",
-//     lineInterpolate: 'basis'
-// });
-// g.setEdge("begin", "analyze_insert_mid_zg_enquiry", {
-//     label: "",
-//     lineInterpolate: 'basis'
-// });
-// g.setEdge("begin", "analyze_insert_mid_zg_allowance", {
-//     label: "",
-//     lineInterpolate: 'basis'
-// });
-// g.setEdge("analyze_insert_mid_zg_proxy_user", "analyze_insert_app_zg_order_deposit", {
-//     label: "",
-//     lineInterpolate: 'basis'
-// });
-// g.setEdge("analyze_insert_mid_zg_proxy_user", "analyze_insert_app_zg_enquiry", {
-//     label: "",
-//     lineInterpolate: 'basis'
-// });
-// g.setEdge("analyze_insert_mid_zg_order", "analyze_insert_app_zg_order_deposit", {
-//     label: "",
-//     lineInterpolate: 'basis'
-// });
-// g.setEdge("analyze_insert_mid_zg_order", "analyze_insert_app_zg_enquiry", {
-//     label: "",
-//     lineInterpolate: 'basis'
-// });
-// g.setEdge("analyze_insert_mid_zg_enquiry", "analyze_insert_app_zg_order_deposit", {
-//     label: "",
-//     lineInterpolate: 'basis'
-// });
-// g.setEdge("analyze_insert_mid_zg_enquiry", "analyze_insert_app_zg_enquiry", {
-//     label: "",
-//     lineInterpolate: 'basis'
-// });
-// g.setEdge("analyze_insert_mid_zg_allowance", "analyze_insert_app_zg_allowance", {
-//     label: "",
-//     lineInterpolate: 'basis'
-// });
-// g.setEdge("analyze_insert_app_zg_order_deposit", "end", {
-//     label: "",
-//     lineInterpolate: 'basis'
-// });
-// g.setEdge("analyze_insert_app_zg_enquiry", "end", {
-//     label: "",
-//     lineInterpolate: 'basis'
-// });
-// g.setEdge("analyze_insert_app_zg_allowance", "end", {
-//   label: "",
-//   lineInterpolate: 'basis'
-// });
-
-
-let render = new dagreD3.render();
-
-// Set up an SVG group so that we can translate the final graph.
-let svg = d3.select("#tree").append('svg');
-let inner = svg.append("g");
-render(inner, g);
-
-
-
-// Set up zoom support
-let zoom = d3.behavior.zoom().scaleExtent([0.1, 100])
-    .on('zoomstart', () => {
-        svg.style('cursor', 'move')
+// 储存关系数据中的node节点
+renderGraphChart.prototype.mregeEdgeNode = function () {
+    this.edgeList.forEach(item => {
+        const { from, to} = item;
+        !this.NodeList[from] && (this.NodeList[from] = {});
+        !this.NodeList[to] && (this.NodeList[to] = {});
     })
-    .on("zoom", function() {
-        inner.attr('transform',
-            "translate(" + d3.event.translate + ")" +
-            "scale(" + d3.event.scale + ")"
-        )
-    }).on('zoomend', () => {
-        svg.style('cursor', 'default')
+}
+// 渲染节点
+renderGraphChart.prototype.renderNode = function () {
+
+    this.g = new dagreD3.graphlib.Graph().setGraph({
+        rankdir: 'LR', // 水平
+        nodesep: 15,
+        edgesep: 10,
+        ranksep: 80,
+        marginx: 20,
+        marginy: 20
     });
-svg.call(zoom);
 
-let timer;
-const nodeEnter = inner.selectAll('g.node');
+    // 创建Node节点
+    Object.keys(this.NodeList).forEach((key) =>  {
+        var item = this.NodeList[key];
+        const label = item.label || key;
+        const style = item.style || "fill: #f1ede4; stroke: #82b784; color: #222; margin: 5px";
+        this.g.setNode(key, { label, rx:5,ry:5, style});
+    });
 
-
-
-// 圆点添加 提示框
-nodeEnter
-    .on('mouseover', function(d) {
-        tooltipOver(d)
-        console.log(d)
+    // 创建线条
+    list.forEach(item => {
+        const { from, to} = item;
+        this.g.setEdge(from, to, { lineInterpolate: 'basis'});
     })
-    .on('mouseout', () => {
-        timer = setTimeout(function() {
-            d3.select('.chartTooltip').transition().duration(300).style('opacity', 0).style('display', 'none')
-        }, 200)
-    });
-// 偏移节点内文本内容
-// nodeEnter.select('g.label').attr('transform', 'translate(0, 0)');
-// 添加 tag 标签
-// nodeEnter.append('text')
-//     .text((d) => {
-//         return d
-//     });
 
-function tooltipOver(d) {
-    if (timer) clearTimeout(timer);
-    d3.select('.chartTooltip').transition().duration(300).style('opacity', 1).style('display', 'block');
-    const yPosition = d3.event.layerY + 20;
-    const xPosition = d3.event.layerX + 20;
-    const chartTooltip = d3.select('.chartTooltip')
-        .style('left', xPosition + 'px')
-        .style('top', yPosition + 'px');
+    // 渲染节点
+    let render = new dagreD3.render();
+    let svg = d3.select(this.elId).append('svg');
+    this.inner = svg.append("g");
+    render(this.inner, this.g);
+}
 
-    d3.select('.chartTooltip').on('mouseover', () => {
-        if (timer) clearTimeout(timer);
-        d3.select('.chartTooltip').transition().duration(300).style('opacity', 1).style('display', 'block')
-    }).on('mouseout', () => {
-        timer = setTimeout(function() {
-            d3.select('.chartTooltip').transition().duration(300).style('opacity', 0).style('display', 'none')
-        }, 200)
-    });
+// 添加鼠标经过事件
+renderGraphChart.prototype.addMouseover = function () {
+    const { inner, NodeList } = this;
+    const nodeEnter = inner.selectAll('g.node');
+    nodeEnter.on('mouseover', (key) =>  {
+            // 事件处理
+            NodeList[key].info && this.tooltipOver(key)
+            // 上下游颜色事件
+            NodeList[key] && this.showRelated(key)
+        })
+        .on('mouseout', (key) => {
+            // 上下游颜色事件
+            NodeList[key] && this.hideRelated(key)
+            this.timer = setTimeout(function() {
+                d3.select('.chartTooltip').transition().duration(300).style('opacity', 0).style('display', 'none')
+            }, 200)
+        });
+}
 
-    if (d) {
-        chartTooltip.select('.chartTooltip-label').text('Task_id：' + d)
-    } else {
-        chartTooltip.select('.chartTooltip-label').text('label：' + d)
-    }
-    if (g.node(d).name) {
-        chartTooltip.select('.chartTooltip-info').text('名字2：' + g.node(d).name)
-    } else {
-        chartTooltip.select('.chartTooltip-info').text('名字2：' + g.node(d).name)
+
+
+
+
+
+// 执行事件
+renderGraphChart.prototype.tooltipOver = function(key){
+    let { timer, NodeList  } = this
+    timer && clearTimeout(timer);
+    if (NodeList[key].info) {
+        d3.select('.chartTooltip').transition().duration(300).style('opacity', 1).style('display', 'block');
+        // 设置位置
+        const node = this.g.node(key);
+        const { width, height} = node.elem.getBBox();
+        const xPosition = node.x + width/2 + 10;
+        const yPosition = node.y- height/2;
+        const chartTooltip = d3.select('.chartTooltip').style('left', xPosition + 'px').style('top', yPosition + 'px');
+
+        chartTooltip.select('.chartTooltip-label').text(NodeList[key].info)
+        d3.select('.chartTooltip').on('mouseover', () => {
+            if (this.timer) clearTimeout(this.timer);
+            d3.select('.chartTooltip').transition().duration(300).style('opacity', 1).style('display', 'block')
+        }).on('mouseout', () => {
+            this.timer = setTimeout(function() {
+                d3.select('.chartTooltip').transition().duration(300).style('opacity', 0).style('display', 'none')
+            }, 200)
+        });
     }
 }
+
+
+renderGraphChart.prototype.showRelated = function(key){
+    // highlight_nodes( 'red')
+    // highlight_nodes(this.g.successors(key), 'red')
+    // rect
+    this.g.predecessors(key).forEach(item => {
+        // this.g.node(item).style = '' 
+        console.log(d3.select(item))
+    })
+    // console.log(this.g)
+    // console.log()
+    // console.log(this.NodeList[key].nextItem)
+    // 
+}
+
+
+renderGraphChart.prototype.hideRelated = function(key){
+    // console.log(this.NodeList[key].prevItem)
+    // console.log(this.NodeList[key].nextItem)
+    // this.g.node(key)
+}
+
+
+const NodeInfo = {
+    'begin':{
+        style:'fill: red; stroke: red;',
+        label:'开始',
+        info:'aaaaaa'
+    },
+    'end':{
+        label:'结束',
+        info:'aaaaaa'
+    },
+};
+
+const list = [
+    {from:'begin',to:'analyze_insert_mid_zg_proxy_user'},
+    {from:'begin',to:'analyze_insert_mid_zg_order'},
+    {from:'begin',to:'analyze_insert_mid_zg_enquiry'},
+    {from:'begin',to:'analyze_insert_mid_zg_allowance'},
+    {from:'analyze_insert_mid_zg_proxy_user',to:'analyze_insert_app_zg_order_deposit'},
+    {from:'analyze_insert_mid_zg_proxy_user',to:'analyze_insert_app_zg_enquiry'},
+    {from:'analyze_insert_mid_zg_order',to:'analyze_insert_app_zg_order_deposit'},
+    {from:'analyze_insert_mid_zg_order',to:'analyze_insert_app_zg_enquiry'},
+    {from:'analyze_insert_mid_zg_enquiry',to:'analyze_insert_app_zg_order_deposit'},
+    {from:'analyze_insert_mid_zg_enquiry',to:'analyze_insert_app_zg_enquiry'},
+    {from:'analyze_insert_mid_zg_allowance',to:'analyze_insert_app_zg_allowance'},
+    {from:'analyze_insert_app_zg_order_deposit',to:'end'},
+    {from:'analyze_insert_app_zg_enquiry',to:'end'},
+    {from:'analyze_insert_app_zg_allowance',to:'end'},
+    // {from:'end',to:'aaa'},
+    // {from:'aaa',to:'end'},
+];
+
+
+
+// 第二自定义样式、第三个参数DOM选择器  非必选
+// new renderGraphChart(list)
+new renderGraphChart(list,NodeInfo)
+// new renderGraphChart(list,NodeInfo,'#tree')
