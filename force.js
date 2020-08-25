@@ -103,7 +103,6 @@ renderGraphChart.prototype.tooltipOver = function(key){
 
 
 renderGraphChart.prototype.showRelated = function(key){
-
     d3.select(this.g.node(key).elem).selectAll("rect").style({fill: '#FEF0F0'})
     const hoverStyle = {
             stroke: 'red'
@@ -133,11 +132,11 @@ const NodeInfo = {
     'begin':{
         style:'fill: red; stroke: red;',
         label:'开始',
-        info:'aaaaaa'
+        info:'11111'
     },
     'end':{
         label:'结束',
-        info:'aaaaaa'
+        info:'22222'
     },
 };
 
@@ -156,8 +155,8 @@ const list = [
     {from:'analyze_insert_app_zg_order_deposit',to:'end'},
     {from:'analyze_insert_app_zg_enquiry',to:'end'},
     {from:'analyze_insert_app_zg_allowance',to:'end'},
-    // {from:'end',to:'aaa'},
-    // {from:'aaa',to:'end'},
+    {from:'end',to:'aaa'},
+    {from:'aaa',to:'end'},
 ];
 
 
