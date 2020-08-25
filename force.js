@@ -6,6 +6,7 @@ function renderGraphChart(data,extendConfig = {}, elId = '#tree'){
     // 关系数据
     this.edgeList = data;
     this.elId = elId;
+    this.defaultStyle = 'fill: #f1ede4; stroke: #82b784; color: #222; margin: 5px';
     // 筛选不包含在extendConfig中的节点
     this.mregeEdgeNode()
     // 渲染节点
@@ -38,7 +39,7 @@ renderGraphChart.prototype.renderNode = function () {
     Object.keys(this.NodeList).forEach((key) =>  {
         var item = this.NodeList[key];
         const label = item.label || key;
-        const style = item.style || "fill: #f1ede4; stroke: #82b784; color: #222; margin: 5px";
+        const style = item.style || this.defaultStyle;
         this.g.setNode(key, { label, rx:5,ry:5, style});
     });
 
@@ -75,10 +76,6 @@ renderGraphChart.prototype.addMouseover = function () {
 }
 
 
-
-
-
-
 // 执行事件
 renderGraphChart.prototype.tooltipOver = function(key){
     let { timer, NodeList  } = this
@@ -106,24 +103,29 @@ renderGraphChart.prototype.tooltipOver = function(key){
 
 
 renderGraphChart.prototype.showRelated = function(key){
-    // highlight_nodes( 'red')
-    // highlight_nodes(this.g.successors(key), 'red')
-    // rect
-    this.g.predecessors(key).forEach(item => {
-        // this.g.node(item).style = '' 
-        console.log(d3.select(item))
+
+    d3.select(this.g.node(key).elem).selectAll("rect").style({fill: '#FEF0F0'})
+    const hoverStyle = {
+            stroke: 'red'
+          };
+    const nodeList = this.g.predecessors(key).concat(this.g.successors(key))
+    nodeList.forEach(item => {
+        const node = this.g.node(item);
+        d3.select(node.elem).selectAll("rect").style(hoverStyle)
     })
-    // console.log(this.g)
-    // console.log()
-    // console.log(this.NodeList[key].nextItem)
-    // 
 }
 
 
 renderGraphChart.prototype.hideRelated = function(key){
-    // console.log(this.NodeList[key].prevItem)
-    // console.log(this.NodeList[key].nextItem)
-    // this.g.node(key)
+    d3.select(this.g.node(key).elem).selectAll("rect").style({fill: '#f1ede4'})
+    const defaultStyle = {
+            stroke: '#82b784'
+          };
+    const nodeList = this.g.predecessors(key).concat(this.g.successors(key))
+    nodeList.forEach(item => {
+        const node = this.g.node(item);
+        d3.select(node.elem).selectAll("rect").style(defaultStyle)
+    })
 }
 
 
