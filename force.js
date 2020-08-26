@@ -75,7 +75,6 @@ renderGraphChart.prototype.addMouseover = function () {
         });
 }
 
-
 // 执行事件
 renderGraphChart.prototype.tooltipOver = function(key){
     let { timer, NodeList  } = this
@@ -101,7 +100,6 @@ renderGraphChart.prototype.tooltipOver = function(key){
     }
 }
 
-
 renderGraphChart.prototype.showRelated = function(key){
     d3.select(this.g.node(key).elem).selectAll("rect").style({fill: '#FEF0F0'})
     const hoverStyle = {
@@ -113,7 +111,6 @@ renderGraphChart.prototype.showRelated = function(key){
         d3.select(node.elem).selectAll("rect").style(hoverStyle)
     })
 }
-
 
 renderGraphChart.prototype.hideRelated = function(key){
     d3.select(this.g.node(key).elem).selectAll("rect").style({fill: '#f1ede4'})
