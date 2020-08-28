@@ -54,6 +54,15 @@ renderGraphChart.prototype.renderNode = function () {
     let svg = d3.select(this.elId).append('svg');
     this.inner = svg.append("g");
     render(this.inner, this.g);
+
+
+    // 添加缩放
+    const zoom = d3.behavior.zoom().scaleExtent([0.1, 100])
+    .on('zoomstart', () => svg.style('cursor', 'move'))
+    .on("zoom", () => this.inner.attr('transform',"translate(" + d3.event.translate + ")" + "scale(" + d3.event.scale + ")"))
+    .on('zoomend', () => svg.style('cursor', 'default'));
+    svg.call(zoom);
+
 }
 
 // 添加鼠标经过事件
